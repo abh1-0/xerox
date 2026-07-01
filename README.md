@@ -1,9 +1,8 @@
 # 🖨️ DigiCenter — Smart Xerox & Digital Service Hub
 
-DigiCenter is a modern QR-based digital service system for Xerox shops and local service centers in India.  
-It replaces manual queues, pen drives, and paper slips with a fully digital workflow.
+DigiCenter is a modern web-based digital service system made for millions of Xerox & printing shops in India. 
 
-From printing documents to handling Aadhaar, PAN, and certificate services — everything runs through a single system.
+It replaces manual queues, slow internet, and messaging apps (WhatsApp) with a fully digital workflow.
 
 ---
 
@@ -18,9 +17,9 @@ From printing documents to handling Aadhaar, PAN, and certificate services — e
   - Single / Double-sided
   - Number of copies
 - Live price calculation
-- UPI payment support (intent-based)
+- UPI payment support (intent-based, no payment gateway (I'm not that rich, duh))
 - Order tracking system
-- Token generation for service requests
+- Token generation for service requests (PAN/Aadhar/Certificates)
 
 ---
 
