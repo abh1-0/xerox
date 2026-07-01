@@ -1,4 +1,5 @@
-# 🖨️ DigiCenter — Smart Xerox & Digital Service Hub
+![Banner](./assets/banner.png)
+# 🖨️ xerox
 
 DigiCenter is a modern web-based digital service system made for millions of Xerox & printing shops in India. 
 
