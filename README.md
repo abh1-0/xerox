@@ -1,87 +1,95 @@
-![Banner](./assets/banner.png)
-# 🖨️ xerox
+# 🖨️ DigiCenter (Xerox DigiCenter)
 
-DigiCenter is a modern web-based digital service system made for millions of Xerox & printing shops in India. 
-
-It replaces manual queues, slow internet, and messaging apps (WhatsApp) with a fully digital workflow.
+DigiCenter is a modern web-based digital service system made for Xerox & printing shops. It replaces manual queues, slow internet, and messaging apps (like WhatsApp) with a fully digital, end-to-end workflow.
 
 ---
 
 ## 🚀 Features
 
 ### 📱 Customer Side
-- QR code-based access
-- Upload documents (PDF, images)
-- Select print options:
-  - Color / B&W
-  - A4 / A3
-  - Single / Double-sided
-  - Number of copies
-- Live price calculation
-- UPI payment support (intent-based, no payment gateway (I'm not that rich, duh))
-- Order tracking system
-- Token generation for service requests (PAN/Aadhar/Certificates)
+- **QR-code based access**: Scan and upload instantly.
+- **Upload documents**: PDF and images supported.
+- **Granular Print Customization**:
+  - Color / B&W printing.
+  - Paper Size (A4 / A3).
+  - Sides (Single / Double-sided).
+  - **Paper Quality** (Standard 75gsm / Premium 100gsm / Glossy Photo).
+  - **Binding Options** (None / Spiral / Hardbound).
+- **Dynamic Price Engine**: Real-time calculations as customers change parameters.
+- **Direct UPI QR Integration**: Pay via UPI QR code directly on checkout.
+- **Order Tracking**: Track the status of jobs (Pending, Processing, Completed).
+- **Government Services Intake**: Token generation for Aadhaar / PAN updates, certificates, and more.
 
----
+### 🏢 Shopkeeper Dashboard (Secured 🔒)
+- **Role-based Authentication**: Secured dashboard protected by Firebase Auth (fallback to PIN/Password in offline mode).
+- **Real-Time Live Queue**: View new orders and service requests as they are created.
+- **Human Request Acceptance**: Accept, Reject, or Print jobs directly from the dashboard.
+- **Local Print Integration**: Click "Approve & Print" to send files to the local Windows print spooler.
+- **Rates Configuration**: Update print pricing tiers and the shop's UPI ID dynamically.
 
-### 🏢 Shopkeeper Dashboard
-- Live order queue
-- Accept / Reject requests
-- Auto file preview
-- Service management system:
-  - Aadhaar updates
-  - PAN applications
-  - Birth certificates
-  - Other government services
-- Token-based queue system
-- Status updates (Pending → Processing → Completed)
-
----
-
-### 🧠 System Features
-- Firebase backend (serverless architecture)
-- Real-time updates
-- Secure file storage
-- Role-based access control
-- Scalable architecture for multiple shops
+### 🖨️ Windows Print Client (Local Worker)
+- Standing worker running locally on the shop's Windows PC.
+- Detects locally installed Windows printers.
+- Maps print configurations (e.g., "Black & White (A4)" or "Color (A3)") to specific physical printers.
+- Automatically handles file downloading and silent spooling upon dashboard approval.
 
 ---
 
 ## 🧱 Tech Stack
 
-- Frontend: HTML / CSS / JavaScript (or React optional)
-- Backend: Firebase
-  - Firestore (Database)
-  - Storage (File uploads)
-  - Authentication (User roles)
-  - Hosting (Web deployment)
-- Optional Worker: Python / Node.js (Windows print client)
+- **Web Frontend**: React.js / Vite / Vanilla CSS (Tailwind avoided)
+- **Cloud Backend**: Firebase
+  - **Firestore**: Real-time database.
+  - **Storage**: Secure document upload repository.
+  - **Authentication**: Secured login flow.
+- **Local Worker**: Node.js / Express / `pdf-to-printer`
+
+---
+
+## ⚙️ Setup & Installation
+
+### 1. Web Application Setup
+1. Clone this repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Copy `.env.example` to `.env` and fill in your Firebase Web App credentials. If left empty, the application runs automatically in **Offline Mock Mode** (using `localStorage` and a local security bypass PIN: `admin123`).
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+### 2. Windows Print Client Setup
+1. Open the `print-client` directory.
+2. Install dependencies:
+   ```bash
+   cd print-client
+   npm install
+   ```
+3. Run the print client:
+   ```bash
+   node server.js
+   ```
+4. Access the Printer Mapping dashboard at: `http://localhost:3001`
+5. Select the physical printers connected to your Windows computer and map them to their corresponding print configurations. Save mappings.
 
 ---
 
 ## 🔥 System Architecture
 
-Customer Phone → Web App → Firebase → Shop Dashboard → Windows Print Client → Printer
-
----
-
-## 💡 Future Improvements
-
-- Multi-shop network system
-- WhatsApp notifications
-- SMS alerts
-- AI document validation
-- Auto UPI verification
-- Mobile app version
+```mermaid
+graph TD
+    A[Customer Phone] -->|Upload File & Pay| B(Firebase Storage & Firestore)
+    B -->|Real-time update| C[Shopkeeper Dashboard]
+    C -->|Approve & Print| D[Local Print Client: Port 3001]
+    D -->|Download PDF| E[Temporary File]
+    E -->|pdf-to-printer| F[Windows Print Spooler]
+    F -->|Physical Print| G[Xerox Machine / Printer]
+```
 
 ---
 
 ## ⚠️ Disclaimer
 
-Educational prototype for learning and development purposes. Real deployment may require compliance, security hardening, and payment gateway integration.
-
----
-
-## ⭐ Vision
-
-Transform local Xerox & service centers into digital, queue-less service hubs.
+Educational prototype representing local Xerox digitizing workflows. Production use requires compliance, payment gateway verification, and environment security hardening.
