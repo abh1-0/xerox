@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-05T11:52:04.0978541Z",
+  "title": "Design System: Sprint Customer Web",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Counter Paper", "canonical": "#f4f5f1", "tonalRamp": ["oklch(18% 0.008 100)", "oklch(30% 0.008 100)", "oklch(42% 0.008 100)", "oklch(54% 0.008 100)", "oklch(66% 0.008 100)", "oklch(78% 0.008 100)", "oklch(88% 0.008 100)", "oklch(96% 0.008 100)"] },
+      "field-paper": { "role": "neutral", "displayName": "Field Paper", "canonical": "#fbfcfa", "tonalRamp": ["oklch(18% 0.006 130)", "oklch(30% 0.006 130)", "oklch(42% 0.006 130)", "oklch(54% 0.006 130)", "oklch(66% 0.006 130)", "oklch(78% 0.006 130)", "oklch(88% 0.006 130)", "oklch(98% 0.006 130)"] },
+      "paper-glass": { "role": "neutral", "displayName": "Topbar Paper Glass", "canonical": "rgba(244, 245, 241, 0.78)", "tonalRamp": ["oklch(18% 0.008 100)", "oklch(30% 0.008 100)", "oklch(42% 0.008 100)", "oklch(54% 0.008 100)", "oklch(66% 0.008 100)", "oklch(78% 0.008 100)", "oklch(88% 0.008 100)", "oklch(96% 0.008 100)"] },
+      "ink": { "role": "neutral", "displayName": "Service Ink", "canonical": "#15202b", "tonalRamp": ["oklch(15% 0.025 248)", "oklch(26% 0.025 248)", "oklch(37% 0.025 248)", "oklch(48% 0.025 248)", "oklch(59% 0.025 248)", "oklch(70% 0.025 248)", "oklch(82% 0.025 248)", "oklch(94% 0.025 248)"] },
+      "brand-navy": { "role": "neutral", "displayName": "Brand Navy", "canonical": "#0c1c32", "tonalRamp": ["oklch(14% 0.035 255)", "oklch(25% 0.035 255)", "oklch(36% 0.035 255)", "oklch(47% 0.035 255)", "oklch(58% 0.035 255)", "oklch(69% 0.035 255)", "oklch(81% 0.035 255)", "oklch(94% 0.035 255)"] },
+      "muted": { "role": "neutral", "displayName": "Quiet Operational Text", "canonical": "#52616e", "tonalRamp": ["oklch(18% 0.018 245)", "oklch(29% 0.018 245)", "oklch(40% 0.018 245)", "oklch(51% 0.018 245)", "oklch(62% 0.018 245)", "oklch(73% 0.018 245)", "oklch(84% 0.018 245)", "oklch(95% 0.018 245)"] },
+      "rule": { "role": "neutral", "displayName": "Printed Rule", "canonical": "#aab5b9", "tonalRamp": ["oklch(18% 0.012 225)", "oklch(29% 0.012 225)", "oklch(40% 0.012 225)", "oklch(51% 0.012 225)", "oklch(62% 0.012 225)", "oklch(73% 0.012 225)", "oklch(84% 0.012 225)", "oklch(95% 0.012 225)"] },
+      "heavy-rule": { "role": "neutral", "displayName": "Receipt Rule", "canonical": "#172636", "tonalRamp": ["oklch(16% 0.025 245)", "oklch(27% 0.025 245)", "oklch(38% 0.025 245)", "oklch(49% 0.025 245)", "oklch(60% 0.025 245)", "oklch(71% 0.025 245)", "oklch(82% 0.025 245)", "oklch(94% 0.025 245)"] },
+      "field-border": { "role": "neutral", "displayName": "Field Border", "canonical": "#87959d", "tonalRamp": ["oklch(18% 0.015 225)", "oklch(29% 0.015 225)", "oklch(40% 0.015 225)", "oklch(51% 0.015 225)", "oklch(62% 0.015 225)", "oklch(73% 0.015 225)", "oklch(84% 0.015 225)", "oklch(95% 0.015 225)"] },
+      "gridline": { "role": "neutral", "displayName": "Construction Grid", "canonical": "rgba(20, 52, 91, 0.06)", "tonalRamp": ["oklch(18% 0.035 250)", "oklch(29% 0.035 250)", "oklch(40% 0.035 250)", "oklch(51% 0.035 250)", "oklch(62% 0.035 250)", "oklch(73% 0.035 250)", "oklch(84% 0.035 250)", "oklch(95% 0.035 250)"] },
+      "cobalt": { "role": "primary", "displayName": "Operational Cobalt", "canonical": "#0e4fc9", "tonalRamp": ["oklch(18% 0.18 264)", "oklch(28% 0.18 264)", "oklch(38% 0.18 264)", "oklch(48% 0.18 264)", "oklch(58% 0.18 264)", "oklch(68% 0.18 264)", "oklch(80% 0.14 264)", "oklch(93% 0.06 264)"] },
+      "cobalt-deep": { "role": "primary", "displayName": "Pressed Cobalt", "canonical": "#0a3e9f", "tonalRamp": ["oklch(16% 0.16 264)", "oklch(26% 0.16 264)", "oklch(36% 0.16 264)", "oklch(46% 0.16 264)", "oklch(56% 0.16 264)", "oklch(66% 0.16 264)", "oklch(78% 0.13 264)", "oklch(92% 0.06 264)"] },
+      "cobalt-ink": { "role": "primary", "displayName": "Blueprint Ink", "canonical": "#0d3e99", "tonalRamp": ["oklch(16% 0.15 260)", "oklch(26% 0.15 260)", "oklch(36% 0.15 260)", "oklch(46% 0.15 260)", "oklch(56% 0.15 260)", "oklch(66% 0.15 260)", "oklch(78% 0.12 260)", "oklch(92% 0.05 260)"] },
+      "focus-blue": { "role": "primary", "displayName": "Focus Blue", "canonical": "#1769ff", "tonalRamp": ["oklch(20% 0.2 265)", "oklch(30% 0.2 265)", "oklch(40% 0.2 265)", "oklch(50% 0.2 265)", "oklch(60% 0.2 265)", "oklch(70% 0.2 265)", "oklch(82% 0.15 265)", "oklch(94% 0.06 265)"] },
+      "blue-pale": { "role": "secondary", "displayName": "Soft Blue Register", "canonical": "#c9dcff", "tonalRamp": ["oklch(20% 0.06 260)", "oklch(30% 0.06 260)", "oklch(40% 0.06 260)", "oklch(50% 0.06 260)", "oklch(60% 0.06 260)", "oklch(70% 0.06 260)", "oklch(82% 0.05 260)", "oklch(94% 0.03 260)"] },
+      "blue-wash": { "role": "secondary", "displayName": "Hover Blue Wash", "canonical": "#e7eef9", "tonalRamp": ["oklch(20% 0.03 255)", "oklch(30% 0.03 255)", "oklch(40% 0.03 255)", "oklch(50% 0.03 255)", "oklch(60% 0.03 255)", "oklch(70% 0.03 255)", "oklch(84% 0.025 255)", "oklch(96% 0.012 255)"] },
+      "ready-green": { "role": "tertiary", "displayName": "Ready Green", "canonical": "#176040", "tonalRamp": ["oklch(18% 0.08 150)", "oklch(28% 0.08 150)", "oklch(38% 0.08 150)", "oklch(48% 0.08 150)", "oklch(58% 0.08 150)", "oklch(68% 0.08 150)", "oklch(80% 0.06 150)", "oklch(93% 0.025 150)"] },
+      "live-green": { "role": "tertiary", "displayName": "Live Signal", "canonical": "#117a48", "tonalRamp": ["oklch(18% 0.1 150)", "oklch(28% 0.1 150)", "oklch(38% 0.1 150)", "oklch(48% 0.1 150)", "oklch(58% 0.1 150)", "oklch(68% 0.1 150)", "oklch(80% 0.07 150)", "oklch(93% 0.03 150)"] },
+      "error-red": { "role": "tertiary", "displayName": "Exception Red", "canonical": "#a52619", "tonalRamp": ["oklch(18% 0.13 30)", "oklch(28% 0.13 30)", "oklch(38% 0.13 30)", "oklch(48% 0.13 30)", "oklch(58% 0.13 30)", "oklch(68% 0.13 30)", "oklch(80% 0.09 30)", "oklch(93% 0.035 30)"] },
+      "action-text": { "role": "neutral", "displayName": "Action Text", "canonical": "#ffffff", "tonalRamp": ["oklch(15% 0 0)", "oklch(27% 0 0)", "oklch(39% 0 0)", "oklch(51% 0 0)", "oklch(63% 0 0)", "oklch(75% 0 0)", "oklch(87% 0 0)", "oklch(100% 0 0)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Blueprint Display", "purpose": "The six-cell SPRINT wordmark on the customer home screen." },
+      "headline": { "displayName": "Counter Prompt", "purpose": "Short question-led screen prompts and flow titles." },
+      "title": { "displayName": "Service Section Title", "purpose": "Service and form-section headings." },
+      "body": { "displayName": "Customer Copy", "purpose": "Direct explanations, privacy guidance, and request context." },
+      "label": { "displayName": "Operational Label", "purpose": "Fields, state metadata, pricing details, and status facts." }
+    },
+    "shadows": [
+      { "name": "primary-action-lift", "value": "0 8px 20px rgba(14, 79, 201, 0.22)", "purpose": "The only persistent shadow; used on cobalt primary actions." }
+    ],
+    "motion": [
+      { "name": "loading-spin", "value": "spin 1s linear infinite", "purpose": "Loading feedback for upload and connection activity." },
+      { "name": "primary-hover-nudge", "value": "translateY(-1px)", "purpose": "Hover-only lift for an enabled primary action; no decorative motion system." }
+    ],
+    "breakpoints": [
+      { "name": "compact", "value": "520px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Sprint Brand Mark",
+      "kind": "custom",
+      "description": "Compact wordmark for the sticky shop context bar.",
+      "html": "<div class=\"ds-brand\" aria-label=\"Sprint by abh1\"><span class=\"ds-brand-grid\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><strong>sprint</strong><small>by abh1</small></div>",
+      "css": ".ds-brand{display:inline-flex;align-items:baseline;gap:6px;color:#0c1c32;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif;font-size:25px;font-weight:800;letter-spacing:-.03em}.ds-brand small{color:#52616e;font-size:11px;font-weight:600;letter-spacing:-.01em}.ds-brand-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:18px;height:18px;transform:rotate(-8deg)}.ds-brand-grid i{background:#1769ff}.ds-brand-grid i:nth-child(2),.ds-brand-grid i:nth-child(6){background:#0c1c32}"
+    },
+    {
+      "name": "Sticky Topbar",
+      "kind": "nav",
+      "description": "Paper-glass shop context bar; the only blurred, sticky layer in the system.",
+      "html": "<header class=\"ds-topbar\"><strong>sprint</strong><span>⌖ abh1 Print &amp; Services</span></header>",
+      "css": ".ds-topbar{height:70px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #b7c2c5;background:rgba(244,245,241,.78);color:#364655;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif;font-size:13px;font-weight:650;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}.ds-topbar strong{color:#0c1c32;font-size:25px;font-weight:800;letter-spacing:-.03em}.ds-topbar span{white-space:nowrap}.ds-topbar:focus-within{outline:3px solid #1769ff;outline-offset:-3px}"
+    },
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one forward action in a customer view.",
+      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 9V3h12v6M6 18H4V9h16v9h-2M7 14h10v7H7z\"/></svg>Print something <span>›</span></button>",
+      "css": ".ds-btn-primary{min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:0;padding:12px 16px;background:#0e4fc9;color:#fff;box-shadow:0 8px 20px rgba(14,79,201,.22);font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif;font-size:13px;font-weight:780;cursor:pointer}.ds-btn-primary svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.ds-btn-primary span{font-size:24px;line-height:0}.ds-btn-primary:hover{background:#0a3e9f;transform:translateY(-1px)}.ds-btn-primary:focus-visible{outline:3px solid #1769ff;outline-offset:3px}.ds-btn-primary:active{transform:translateY(0)}"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A safe return or non-primary next task.",
+      "html": "<button class=\"ds-btn-secondary\">Start another request</button>",
+      "css": ".ds-btn-secondary{min-height:50px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #91a0aa;border-radius:0;padding:12px 16px;background:#f4f5f1;color:#15202b;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif;font-size:13px;font-weight:780;cursor:pointer}.ds-btn-secondary:hover{background:#e7eef9}.ds-btn-secondary:focus-visible{outline:3px solid #1769ff;outline-offset:3px}.ds-btn-secondary:active{background:#c9dcff}"
+    },
+    {
+      "name": "Service Row",
+      "kind": "custom",
+      "description": "Line-led selection row for a shop service; it replaces a card with visible lanes and a chevron.",
+      "html": "<button class=\"ds-service-row\"><span class=\"ds-service-icon\">?</span><span class=\"ds-service-copy\"><strong>PAN application assistance</strong><small>From ₹150</small></span><span class=\"ds-chevron\">›</span></button>",
+      "css": ".ds-service-row{width:100%;min-height:76px;display:grid;grid-template-columns:34px 1fr 24px;align-items:center;padding:13px 2px;border:0;border-bottom:1px solid #aab5b9;border-radius:0;background:rgba(244,245,241,.7);color:#15202b;text-align:left;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif;cursor:pointer}.ds-service-icon{color:#0e4fc9;font-size:20px;font-weight:800}.ds-service-copy strong,.ds-service-copy small{display:block}.ds-service-copy strong{font-size:15px}.ds-service-copy small{margin-top:4px;color:#52616e;font-size:13px}.ds-chevron{font-size:24px}.ds-service-row:hover{background:#e7eef9}.ds-service-row:focus-visible{outline:3px solid #1769ff;outline-offset:-3px}.ds-service-row:active{background:#c9dcff}"
+    },
+    {
+      "name": "File Slot",
+      "kind": "input",
+      "description": "Centered document-upload target bounded only by top and bottom rules.",
+      "html": "<label class=\"ds-file-slot\"><input type=\"file\" aria-label=\"Add your document\"><strong>⇧&nbsp; Add your document</strong><span>PDF, JPG, or PNG · up to 20 MB</span></label>",
+      "css": ".ds-file-slot{min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-top:1px solid #97a5ac;border-bottom:1px solid #97a5ac;color:#163c7d;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif;cursor:pointer}.ds-file-slot input{position:absolute;inline-size:1px;block-size:1px;opacity:0}.ds-file-slot strong{font-size:16px}.ds-file-slot span{color:#52616e;font-size:13px}.ds-file-slot:hover{background:#e7eef9}.ds-file-slot:focus-within{outline:3px solid #1769ff;outline-offset:-3px;background:#e7eef9}"
+    },
+    {
+      "name": "Segmented Choice",
+      "kind": "chip",
+      "refersTo": "segmented-selected",
+      "description": "Adjacent square option cells for print settings such as colour and side.",
+      "html": "<div class=\"ds-segmented\" role=\"group\"><button class=\"ds-segmented-selected\">B&amp;W</button><button>Colour</button></div>",
+      "css": ".ds-segmented{min-height:44px;display:flex;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif}.ds-segmented button{flex:1;border:1px solid #87959d;border-radius:0;background:#fbfcfa;color:#41525e;font:inherit;font-size:13px;cursor:pointer}.ds-segmented button+button{border-left:0}.ds-segmented .ds-segmented-selected{background:#dbe8ff;color:#09397f;font-weight:800}.ds-segmented button:hover{background:#e7eef9}.ds-segmented button:focus-visible{position:relative;outline:3px solid #1769ff;outline-offset:-3px}.ds-segmented button:active{background:#c9dcff}"
+    },
+    {
+      "name": "Price Slip",
+      "kind": "card",
+      "description": "Two-column operational price summary with receipt-weight rules instead of a card surface.",
+      "html": "<aside class=\"ds-price-slip\"><span>1 pages · B&amp;W · A4</span><strong>₹2</strong><small>Final amount is calculated by Sprint’s server.</small></aside>",
+      "css": ".ds-price-slip{display:grid;grid-template-columns:1fr auto;column-gap:10px;row-gap:5px;margin:20px 0;padding:16px 0;border-top:2px solid #172636;border-bottom:1px solid #97a5ac;color:#15202b;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif}.ds-price-slip span,.ds-price-slip small{color:#52616e;font-size:13px}.ds-price-slip strong{font-size:25px;letter-spacing:-.04em}.ds-price-slip small{grid-column:1/-1}.ds-price-slip:focus-within{outline:3px solid #1769ff;outline-offset:3px}"
+    },
+    {
+      "name": "Request Status Rail",
+      "kind": "custom",
+      "description": "A line-led live request timeline with clear completed and upcoming states.",
+      "html": "<ol class=\"ds-status-rail\"><li class=\"ds-status-done\"><span>✓</span>Submitted</li><li class=\"ds-status-done\"><span>✓</span>Accepted</li><li><span>◷</span>Processing</li><li><span>◷</span>Ready</li></ol>",
+      "css": ".ds-status-rail{margin:0;padding:0;border-top:1px solid #aab5b9;list-style:none;color:#71808a;font-family:Aptos,'Segoe UI Variable','Segoe UI',ui-sans-serif,system-ui,sans-serif}.ds-status-rail li{min-height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #aab5b9;font-size:16px}.ds-status-rail li span{width:24px;display:grid;place-items:center}.ds-status-rail .ds-status-done{color:#176040;font-weight:700}.ds-status-rail li:hover{background:#e7eef9}.ds-status-rail li:focus-within{outline:3px solid #1769ff;outline-offset:-3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Crouwel Counter Service Slip",
+    "overview": "Sprint’s customer surface applies Crouwel-inspired operational grid logic to a calm, accurately prepared service slip. It makes a neighborhood print counter feel organized and immediate: strong black-blue type, visible dividing rules, plain-language choices, and a single cobalt action make the next step obvious without turning a practical request into a flashy checkout. The system is mobile-first, dense enough to feel operational and generous enough to read quickly while standing at a counter. Its visual language is intentionally material-light: border lines, spacing, and paper-tone shifts establish order; almost every surface stays flat. The only translucent treatment is the restrained sticky topbar, which keeps shop context visible while preserving the paper field beneath it.",
+    "keyCharacteristics": [
+      "Bright neutral paper field with a faint, precise construction grid.",
+      "Cobalt used as an operational signal for the primary route, icon accents, and key identifiers.",
+      "Square, rule-led controls that echo a printed service slip rather than a consumer card stack.",
+      "Compact system sans typography with tightly tracked, emphatic display type.",
+      "Direct status, privacy, and availability cues that feel trustworthy rather than decorative."
+    ],
+    "rules": [
+      { "name": "The Cobalt Is an Instruction Rule", "body": "Cobalt points to the action or operational fact that matters now; it is not a general decorative fill.", "section": "colors" },
+      { "name": "The Grid Is Structure, Not a Gradient Rule", "body": "Keep the faint construction-grid line pattern. Do not add decorative color gradients, glow fields, or tonal washes.", "section": "colors" },
+      { "name": "The Narrow Question Rule", "body": "Large prompts are questions for a customer in motion: short, left aligned, and never allowed to become a wide marketing headline.", "section": "typography" },
+      { "name": "The One Working Column Rule", "body": "Keep request-making, payment, and status tasks inside the narrow reading column even when the surrounding canvas is wide.", "section": "layout" },
+      { "name": "The Flat Service Counter Rule", "body": "If a boundary is needed, use a rule; do not solve it with cards, ambient shadows, or layered panels.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do retain the bright Counter Paper canvas and faint 24px construction grid on customer screens.",
+      "Do use Cobalt for the one main action, key request number, and functional icon emphasis.",
+      "Do make boundaries with the established 1px and 2px rules before considering another surface.",
+      "Do preserve 44px-minimum fields, 50px-minimum actions, visible 3px keyboard focus, and the reduced-motion override.",
+      "Do keep the topbar as the only sticky, blurred layer."
+    ],
+    "donts": [
+      "Don't introduce rounded cards, pill buttons, glass panels, or general-purpose drop shadows.",
+      "Don't add decorative gradients, glow effects, or a second loud accent color.",
+      "Don't turn the narrow customer task column into a dashboard or a wide marketing layout.",
+      "Don't use green or red for ordinary decoration; they are state signals."
+    ]
+  }
+}
