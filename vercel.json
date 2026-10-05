@@ -3,6 +3,13 @@
   "buildCommand": "npm run build --workspace=@sprint/customer-web",
   "outputDirectory": "apps/customer-web/dist",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "https://wbmbrnurizsujlbzaptl.supabase.co/functions/v1/sprint-api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }

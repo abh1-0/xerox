@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 .sprint-data
+supabase/.temp/
 .playwright-cli/
 .impeccable/review/
 apps/merchant-windows/Sprint.Merchant/bin

@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS service_definitions (
 );
 CREATE TABLE IF NOT EXISTS requests (
   id TEXT PRIMARY KEY, request_number TEXT NOT NULL UNIQUE, shop_id TEXT NOT NULL REFERENCES shops(id), customer_session_id TEXT NOT NULL REFERENCES customer_sessions(id),
-  type TEXT NOT NULL CHECK(type IN ('PRINT','COPY','SCAN','SERVICE')), state TEXT NOT NULL, amount_minor INTEGER NOT NULL DEFAULT 0, currency TEXT NOT NULL DEFAULT 'INR',
+  type TEXT NOT NULL CHECK(type IN ('PRINT','COPY','SCAN','SERVICE','STATIONERY','MIXED')), state TEXT NOT NULL, amount_minor INTEGER NOT NULL DEFAULT 0, currency TEXT NOT NULL DEFAULT 'INR',
   payment_status TEXT NOT NULL, service_definition_id TEXT REFERENCES service_definitions(id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_requests_shop_state ON requests(shop_id, state, created_at DESC);
