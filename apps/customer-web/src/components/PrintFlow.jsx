@@ -1,19 +1,27 @@
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
+  BookOpen,
   CheckCircle2,
   CircleAlert,
   FileText,
+  Layers,
   LoaderCircle,
+  Paperclip,
+  PenTool,
   Plus,
   Printer,
+  ShieldCheck,
+  Sparkles,
   Upload,
   X,
+  Zap,
 } from "lucide-react";
 import { uploadAttachment } from "../api";
 import { useCart } from "../context/CartContext";
 import { money } from "./BrandMark";
 import { calculatePrintPrice } from "@sprint/contracts";
+import { SMART_CROSS_SELLS } from "../recommendations";
 
 export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
   const { addItem } = useCart();
@@ -31,6 +39,34 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
     orientation: "AUTO",
     scaleMode: "FIT",
   });
+
+  // Print Presets for 1-Tap Configuration
+  const PRINT_PRESETS = [
+    {
+      id: "preset-standard-bw",
+      label: "Standard Document",
+      desc: "B&W, Single-sided, A4",
+      options: { colorMode: "BW", sides: "SINGLE", paperSize: "A4" }
+    },
+    {
+      id: "preset-duplex-study",
+      label: "Eco Study Pack",
+      desc: "B&W, 2-Sided (Duplex), A4",
+      options: { colorMode: "BW", sides: "DUPLEX", paperSize: "A4" }
+    },
+    {
+      id: "preset-color-cert",
+      label: "Certificate / ID",
+      desc: "Full Colour, Single-sided, A4",
+      options: { colorMode: "COLOR", sides: "SINGLE", paperSize: "A4" }
+    },
+    {
+      id: "preset-legal-doc",
+      label: "Legal Deed",
+      desc: "B&W, Legal paper, 1-Sided",
+      options: { colorMode: "BW", sides: "SINGLE", paperSize: "LEGAL" }
+    }
+  ];
 
   const rates = useMemo(
     () => ({
@@ -131,6 +167,37 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
     setAddedNotice(true);
   }
 
+  function handleApplyPreset(preset) {
+    setOptions((prev) => ({
+      ...prev,
+      ...preset.options,
+    }));
+  }
+
+  function handleQuickAddAddon(addon) {
+    if (addon.serviceId) {
+      addItem({
+        itemType: "SERVICE",
+        serviceId: addon.serviceId,
+        title: addon.title,
+        quantity: 1,
+        unitPriceMinor: addon.priceMinor,
+        totalPriceMinor: addon.priceMinor,
+        notes: `Add-on for ${file?.originalName || "printed document"}`,
+        priceMode: "FIXED",
+      });
+    } else if (addon.productId) {
+      addItem({
+        itemType: "STATIONERY",
+        productId: addon.productId,
+        title: addon.title,
+        quantity: 1,
+        unitPriceMinor: addon.priceMinor,
+        totalPriceMinor: addon.priceMinor,
+      });
+    }
+  }
+
   return (
     <div className="flow print-flow-container">
       <button type="button" className="back-link" onClick={onBack}>
@@ -138,7 +205,7 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
       </button>
 
       <div className="flow-header">
-        <div className="service-icon">
+        <div className="service-icon print-accent">
           <Printer size={28} />
         </div>
         <div>
@@ -147,7 +214,8 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
         </div>
       </div>
 
-      <section className="file-slot">
+      {/* Upload Zone */}
+      <section className="file-slot premier-card">
         <input
           id="document-upload"
           type="file"
@@ -155,17 +223,22 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
           onChange={(e) => handleFileSelect(e.target.files?.[0])}
         />
         {!file ? (
-          <label htmlFor="document-upload">
-            <Upload size={28} />
+          <label htmlFor="document-upload" className="upload-dropzone">
+            <div className="upload-icon-circle">
+              <Upload size={28} />
+            </div>
             <strong>Select or drop your document</strong>
-            <span>PDF, JPG, or PNG · up to 25 MB</span>
+            <span className="upload-meta">PDF, JPG, or PNG · up to 25 MB</span>
+            <span className="upload-btn-fake">Browse Files</span>
           </label>
         ) : (
           <div className="file-row">
-            <FileText size={26} aria-hidden="true" />
-            <div>
+            <div className="file-icon-box">
+              <FileText size={28} aria-hidden="true" />
+            </div>
+            <div className="file-info-stack">
               <strong>{file.originalName || file.name}</strong>
-              <span>
+              <span className="file-details">
                 {file.pageCount
                   ? `${file.pageCount} page${file.pageCount === 1 ? "" : "s"} · `
                   : ""}
@@ -177,7 +250,7 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
             ) : (
               <button
                 type="button"
-                className="icon-button"
+                className="icon-button remove-file-btn"
                 aria-label="Remove document"
                 onClick={() => {
                   setFile(null);
@@ -198,10 +271,39 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
         </p>
       )}
 
+      {/* Quick Configuration Presets */}
+      {file && (
+        <div className="print-presets-bar">
+          <span className="presets-bar-title">
+            <Zap size={14} /> Quick Presets:
+          </span>
+          <div className="presets-pill-group">
+            {PRINT_PRESETS.map((p) => {
+              const isSelected =
+                options.colorMode === p.options.colorMode &&
+                options.sides === p.options.sides &&
+                options.paperSize === p.options.paperSize;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`preset-pill ${isSelected ? "active" : ""}`}
+                  onClick={() => handleApplyPreset(p)}
+                >
+                  <strong>{p.label}</strong>
+                  <small>{p.desc}</small>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Print Configuration Form */}
       {file && (
         <div className="print-options">
-          <div className="form-section">
-            <h2>Color & Sides</h2>
+          <div className="form-section premier-card">
+            <h3>Color & Sides</h3>
             <div className="option-grid">
               <fieldset>
                 <legend>Color Mode</legend>
@@ -211,14 +313,14 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
                     className={options.colorMode === "BW" ? "selected" : ""}
                     onClick={() => setOptions({ ...options, colorMode: "BW" })}
                   >
-                    B&W (₹2/p)
+                    B&W (₹2/pg)
                   </button>
                   <button
                     type="button"
                     className={options.colorMode === "COLOR" ? "selected" : ""}
                     onClick={() => setOptions({ ...options, colorMode: "COLOR" })}
                   >
-                    Colour (₹10/p)
+                    Colour (₹10/pg)
                   </button>
                 </div>
               </fieldset>
@@ -245,8 +347,8 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
             </div>
           </div>
 
-          <div className="form-section">
-            <h2>Paper & Quantity</h2>
+          <div className="form-section premier-card">
+            <h3>Paper & Quantity</h3>
             <div className="option-grid">
               <label>
                 Paper Size
@@ -257,8 +359,8 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
                   }
                 >
                   <option value="A4">A4 (Standard)</option>
-                  <option value="A3">A3 (Large)</option>
-                  <option value="LEGAL">Legal (Documents)</option>
+                  <option value="A3">A3 (Large Ledger)</option>
+                  <option value="LEGAL">Legal (Deeds / Court)</option>
                 </select>
               </label>
 
@@ -280,8 +382,8 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
             </div>
           </div>
 
-          <div className="form-section">
-            <h2>Page Range</h2>
+          <div className="form-section premier-card">
+            <h3>Page Range</h3>
             <div className="stacked">
               <label htmlFor="page-range-input">Pages to print</label>
               <input
@@ -299,16 +401,44 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
             </div>
           </div>
 
-          <div className="price-slip">
-            <span>Estimated Total ({priceCalculation.selectedPages} pgs × {options.copies} copies)</span>
-            <strong>{money(priceCalculation.totalMinor, shop.currency)}</strong>
+          {/* Contextual Finishing Recommendations */}
+          <div className="contextual-finishing-section premier-card">
+            <div className="finishing-header">
+              <Sparkles size={16} />
+              <h4>Recommended Finishing for this document</h4>
+            </div>
+            <div className="finishing-cards-row">
+              {SMART_CROSS_SELLS.slice(0, 2).map((addon) => (
+                <div key={addon.id} className="finishing-item-card">
+                  <div className="finishing-info">
+                    <strong>{addon.title}</strong>
+                    <span>{addon.subtitle}</span>
+                    <span className="finishing-price">{money(addon.priceMinor, shop.currency)}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="secondary-action mini-add-btn"
+                    onClick={() => handleQuickAddAddon(addon)}
+                  >
+                    + Add to Order
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="price-slip premier-card">
+            <div className="price-slip-row">
+              <span>Estimated Total ({priceCalculation.selectedPages} pgs × {options.copies} copies)</span>
+              <strong>{money(priceCalculation.totalMinor, shop.currency)}</strong>
+            </div>
             <small>Authoritative price verified by Sprint before submission</small>
           </div>
 
           {addedNotice ? (
-            <div className="added-notice-card">
+            <div className="added-notice-card premier-card">
               <div className="notice-content">
-                <CheckCircle2 size={20} className="success-icon" />
+                <CheckCircle2 size={24} className="success-icon" />
                 <div>
                   <strong>Added to your Sprint Cart!</strong>
                   <p>You can add document services or stationery before checking out.</p>
@@ -334,7 +464,7 @@ export function PrintFlow({ shop, sessionToken, onBack, onGoToCart }) {
           ) : (
             <button
               type="button"
-              className="primary-action full-width"
+              className="primary-action full-width add-to-cart-cta"
               onClick={handleAddToCart}
             >
               <Plus size={18} /> Add Print to Cart ({money(priceCalculation.totalMinor, shop.currency)})

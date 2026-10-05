@@ -2,14 +2,19 @@ import { useState } from "react";
 import {
   AlertCircle,
   ArrowRight,
+  BookOpen,
   CheckCircle2,
   CreditCard,
   FileText,
   LoaderCircle,
   Minus,
+  Paperclip,
+  PenTool,
   Plus,
   Printer,
+  ShieldCheck,
   ShoppingBag,
+  Sparkles,
   Trash2,
   Wallet,
   X,
@@ -17,12 +22,14 @@ import {
 import { useCart } from "../context/CartContext";
 import { createCustomerRequest, newKey } from "../api";
 import { money } from "./BrandMark";
+import { SMART_CROSS_SELLS } from "../recommendations";
 
 export function CartDrawer({ shop, sessionToken, onOrderCreated }) {
   const {
     items,
     removeItem,
     updateQuantity,
+    addItem,
     clearCart,
     totalMinor,
     itemCount,
@@ -96,10 +103,34 @@ export function CartDrawer({ shop, sessionToken, onOrderCreated }) {
     }
   }
 
+  function handleQuickCrossSell(cross) {
+    if (cross.serviceId) {
+      addItem({
+        itemType: "SERVICE",
+        serviceId: cross.serviceId,
+        title: cross.title,
+        quantity: 1,
+        unitPriceMinor: cross.priceMinor,
+        totalPriceMinor: cross.priceMinor,
+        notes: "Cross-sell added in checkout drawer",
+        priceMode: "FIXED",
+      });
+    } else if (cross.productId) {
+      addItem({
+        itemType: "STATIONERY",
+        productId: cross.productId,
+        title: cross.title,
+        quantity: 1,
+        unitPriceMinor: cross.priceMinor,
+        totalPriceMinor: cross.priceMinor,
+      });
+    }
+  }
+
   return (
     <div className="drawer-overlay" onClick={() => setIsOpen(false)}>
       <div
-        className="drawer-panel"
+        className="drawer-panel premier-card"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -146,9 +177,10 @@ export function CartDrawer({ shop, sessionToken, onOrderCreated }) {
                 <small className="store-pill">Code: {shop.storeCode || shop.slug}</small>
               </div>
 
+              {/* Items List */}
               <div className="cart-items-list">
                 {items.map((item) => (
-                  <div key={item.id} className="cart-item-row">
+                  <div key={item.id} className="cart-item-row premier-card">
                     <div className="cart-item-icon">
                       {item.itemType === "PRINT" && <Printer size={20} />}
                       {item.itemType === "SERVICE" && <FileText size={20} />}
@@ -203,6 +235,32 @@ export function CartDrawer({ shop, sessionToken, onOrderCreated }) {
                 ))}
               </div>
 
+              {/* Intelligent Cross-sell Suggestions in Cart */}
+              <div className="cart-cross-sell-section">
+                <div className="cross-sell-header">
+                  <Sparkles size={15} />
+                  <span>People also added to this ticket:</span>
+                </div>
+                <div className="cross-sell-carousel">
+                  {SMART_CROSS_SELLS.slice(0, 3).map((cs) => (
+                    <div key={cs.id} className="cart-cross-pill">
+                      <div className="cross-pill-text">
+                        <strong>{cs.title}</strong>
+                        <span>{money(cs.priceMinor, shop.currency)}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="mini-add-cross"
+                        onClick={() => handleQuickCrossSell(cs)}
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Customer Details */}
               <div className="checkout-fields">
                 <h4>Customer Details (Optional)</h4>
                 <div className="fields-grid">

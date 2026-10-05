@@ -5,6 +5,7 @@ import {
   Minus,
   Plus,
   ShoppingBag,
+  Sparkles,
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { money } from "./BrandMark";
@@ -13,6 +14,7 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
   const { addItem } = useCart();
   const [quantities, setQuantities] = useState({});
   const [justAddedId, setJustAddedId] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
 
   const products = shop.products || [
     {
@@ -22,6 +24,7 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
       category: "Notebooks",
       priceMinor: 6500,
       inventoryCount: 45,
+      badge: "Student Favorite",
     },
     {
       id: "prod-pen-01",
@@ -30,6 +33,7 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
       category: "Pens",
       priceMinor: 1000,
       inventoryCount: 150,
+      badge: "Top Seller",
     },
     {
       id: "prod-hl-01",
@@ -38,6 +42,7 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
       category: "Markers",
       priceMinor: 12000,
       inventoryCount: 18,
+      badge: "Exam Kit",
     },
     {
       id: "prod-adh-01",
@@ -46,8 +51,16 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
       category: "Adhesives",
       priceMinor: 2500,
       inventoryCount: 30,
+      badge: "Photo Glue",
     },
   ];
+
+  const categories = ["ALL", ...new Set(products.map((p) => p.category || "General"))];
+
+  const filteredProducts =
+    selectedCategory === "ALL"
+      ? products
+      : products.filter((p) => (p.category || "General") === selectedCategory);
 
   function getQty(id) {
     return quantities[id] || 1;
@@ -93,18 +106,33 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
         </div>
       </div>
 
+      {/* Category Filter Pills */}
+      <div className="category-filter-bar">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            className={`filter-pill ${selectedCategory === cat ? "active" : ""}`}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       <div className="stationery-grid">
-        {products.map((item) => {
+        {filteredProducts.map((item) => {
           const qty = getQty(item.id);
           const isOutOfStock = (item.inventoryCount ?? 99) <= 0;
           const isLowStock = !isOutOfStock && (item.inventoryCount ?? 99) <= 5;
           const wasJustAdded = justAddedId === item.id;
 
           return (
-            <div key={item.id} className="product-card">
+            <div key={item.id} className="product-card premier-card">
               <div className="product-card-body">
                 <div className="product-top-row">
                   <span className="category-tag">{item.category || "General"}</span>
+                  {item.badge && <span className="product-highlight-badge">{item.badge}</span>}
                   {isOutOfStock ? (
                     <span className="stock-tag oos">Out of Stock</span>
                   ) : isLowStock ? (
@@ -124,19 +152,17 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
                 <div className="qty-control">
                   <button
                     type="button"
-                    className="qty-btn"
-                    disabled={qty <= 1 || isOutOfStock}
                     onClick={() => setQty(item.id, -1)}
+                    disabled={isOutOfStock}
                     aria-label="Decrease quantity"
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="qty-val">{qty}</span>
+                  <span>{qty}</span>
                   <button
                     type="button"
-                    className="qty-btn"
-                    disabled={isOutOfStock}
                     onClick={() => setQty(item.id, 1)}
+                    disabled={isOutOfStock}
                     aria-label="Increase quantity"
                   >
                     <Plus size={14} />
@@ -145,9 +171,9 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
 
                 <button
                   type="button"
-                  className={`primary-action add-prod-btn ${wasJustAdded ? "success-state" : ""}`}
-                  disabled={isOutOfStock}
+                  className={`primary-action product-add-btn ${wasJustAdded ? "just-added" : ""}`}
                   onClick={() => handleAddToCart(item)}
+                  disabled={isOutOfStock}
                 >
                   {wasJustAdded ? (
                     <>
@@ -163,23 +189,6 @@ export function StationeryFlow({ shop, onBack, onGoToCart }) {
             </div>
           );
         })}
-      </div>
-
-      <div className="cart-jump-footer">
-        <button
-          type="button"
-          className="secondary-action"
-          onClick={onBack}
-        >
-          Return to Store Categories
-        </button>
-        <button
-          type="button"
-          className="primary-action"
-          onClick={onGoToCart}
-        >
-          Proceed to Cart & Checkout
-        </button>
       </div>
     </div>
   );
