@@ -1,0 +1,21 @@
+{
+  "name": "@sprint/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "migrate": "node src/migrate.js",
+    "seed": "node src/migrate.js --seed",
+    "cleanup": "node src/cleanup.js",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@sprint/contracts": "0.1.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "ws": "^8.18.3"
+  }
+}

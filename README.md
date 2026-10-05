@@ -1,95 +1,32 @@
-# 🖨️ DigiCenter (Xerox DigiCenter)
+# sprint by abh1
 
-DigiCenter is a modern web-based digital service system made for Xerox & printing shops. It replaces manual queues, slow internet, and messaging apps (like WhatsApp) with a fully digital, end-to-end workflow.
+Sprint is a QR-first digital counter for print and document-service shops. A customer uses a mobile web flow; a native Windows merchant application receives the same request and bridges approved jobs to local printers.
 
----
+## Run locally
 
-## 🚀 Features
+1. Copy `.env.example` to `.env` and set non-placeholder development keys.
+2. Install JavaScript workspaces: `npm install`.
+3. Initialize and seed the local relational database: `npm run db:seed`.
+4. Start API, customer web, and admin web together: `npm run dev`.
+5. Open [customer demo](http://localhost:5173/s/abh1-demo). The API is on `http://localhost:8787`; the restricted admin app is on `http://localhost:5174`.
+6. In another terminal, build the native merchant client: `dotnet build apps/merchant-windows/Sprint.Merchant/Sprint.Merchant.csproj`.
+7. Run the local Windows print bridge before printing PDFs: `cd apps/merchant-windows/legacy-print-bridge && npm install && npm start`.
 
-### 📱 Customer Side
-- **QR-code based access**: Scan and upload instantly.
-- **Upload documents**: PDF and images supported.
-- **Granular Print Customization**:
-  - Color / B&W printing.
-  - Paper Size (A4 / A3).
-  - Sides (Single / Double-sided).
-  - **Paper Quality** (Standard 75gsm / Premium 100gsm / Glossy Photo).
-  - **Binding Options** (None / Spiral / Hardbound).
-- **Dynamic Price Engine**: Real-time calculations as customers change parameters.
-- **Direct UPI QR Integration**: Pay via UPI QR code directly on checkout.
-- **Order Tracking**: Track the status of jobs (Pending, Processing, Completed).
-- **Government Services Intake**: Token generation for Aadhaar / PAN updates, certificates, and more.
+The first local merchant registration uses the development setup key from `.env`, then stores only its device token in `%LOCALAPPDATA%\Sprint\Merchant`. Replace the development registration flow with real merchant authentication before production.
 
-### 🏢 Shopkeeper Dashboard (Secured 🔒)
-- **Role-based Authentication**: Secured dashboard protected by Firebase Auth (fallback to PIN/Password in offline mode).
-- **Real-Time Live Queue**: View new orders and service requests as they are created.
-- **Human Request Acceptance**: Accept, Reject, or Print jobs directly from the dashboard.
-- **Local Print Integration**: Click "Approve & Print" to send files to the local Windows print spooler.
-- **Rates Configuration**: Update print pricing tiers and the shop's UPI ID dynamically.
+## Validation
 
-### 🖨️ Windows Print Client (Local Worker)
-- Standing worker running locally on the shop's Windows PC.
-- Detects locally installed Windows printers.
-- Maps print configurations (e.g., "Black & White (A4)" or "Color (A3)") to specific physical printers.
-- Automatically handles file downloading and silent spooling upon dashboard approval.
-
----
-
-## 🧱 Tech Stack
-
-- **Web Frontend**: React.js / Vite / Vanilla CSS (Tailwind avoided)
-- **Cloud Backend**: Firebase
-  - **Firestore**: Real-time database.
-  - **Storage**: Secure document upload repository.
-  - **Authentication**: Secured login flow.
-- **Local Worker**: Node.js / Express / `pdf-to-printer`
-
----
-
-## ⚙️ Setup & Installation
-
-### 1. Web Application Setup
-1. Clone this repository.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Copy `.env.example` to `.env` and fill in your Firebase Web App credentials. If left empty, the application runs automatically in **Offline Mock Mode** (using `localStorage` and a local security bypass PIN: `admin123`).
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-### 2. Windows Print Client Setup
-1. Open the `print-client` directory.
-2. Install dependencies:
-   ```bash
-   cd print-client
-   npm install
-   ```
-3. Run the print client:
-   ```bash
-   node server.js
-   ```
-4. Access the Printer Mapping dashboard at: `http://localhost:3001`
-5. Select the physical printers connected to your Windows computer and map them to their corresponding print configurations. Save mappings.
-
----
-
-## 🔥 System Architecture
-
-```mermaid
-graph TD
-    A[Customer Phone] -->|Upload File & Pay| B(Firebase Storage & Firestore)
-    B -->|Real-time update| C[Shopkeeper Dashboard]
-    C -->|Approve & Print| D[Local Print Client: Port 3001]
-    D -->|Download PDF| E[Temporary File]
-    E -->|pdf-to-printer| F[Windows Print Spooler]
-    F -->|Physical Print| G[Xerox Machine / Printer]
+```powershell
+npm test
+npm run build
 ```
 
----
+`npm test` exercises page-range parsing, pricing in minor currency units, lifecycle transitions, auto-print safeguards, idempotent request creation, authorization boundaries, and the software-level customer → merchant → print-execution → customer-status slice.
 
-## ⚠️ Disclaimer
+## Architecture
 
-Educational prototype representing local Xerox digitizing workflows. Production use requires compliance, payment gateway verification, and environment security hardening.
+See [architecture](docs/ARCHITECTURE.md), [merchant Windows deployment](docs/MERCHANT-WINDOWS.md), and [production deployment](docs/DEPLOYMENT.md). The main local data folder is deliberately excluded from git and contains SQLite state and temporary private objects.
+
+## Production requirements
+
+Use a managed relational database, private object storage with encryption and lifecycle policies, HTTPS/WSS termination, a verified payment provider webhook, real merchant authentication/device enrollment, secret management, central structured logs, and a signed installer/update channel for Sprint Merchant. Do not expose the development payment or development setup endpoints in production.

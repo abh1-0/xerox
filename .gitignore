@@ -8,6 +8,10 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.sprint-data
+.playwright-cli/
+apps/merchant-windows/Sprint.Merchant/bin
+apps/merchant-windows/Sprint.Merchant/obj
 dist
 dist-ssr
 *.local

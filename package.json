@@ -1,25 +1,26 @@
 {
-  "name": "xerox",
+  "name": "sprint-by-abh1",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/api",
+    "apps/customer-web",
+    "apps/admin-web",
+    "packages/contracts"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "npm run dev --workspace=@sprint/api",
+    "dev:customer": "npm run dev --workspace=@sprint/customer-web",
+    "dev:admin": "npm run dev --workspace=@sprint/admin-web",
+    "build": "npm run build --workspace=@sprint/customer-web && npm run build --workspace=@sprint/admin-web && dotnet build apps/merchant-windows/Sprint.Merchant/Sprint.Merchant.csproj",
+    "test": "node --test packages/contracts/test/*.test.mjs apps/api/test/*.test.mjs",
+    "db:migrate": "npm run migrate --workspace=@sprint/api",
+    "db:seed": "npm run seed --workspace=@sprint/api",
+    "worker:cleanup": "npm run cleanup --workspace=@sprint/api"
   },
-  "dependencies": {
-    "firebase": "^12.15.0",
-    "lucide-react": "^1.23.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
-  },
-  "devDependencies": {
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.3",
-    "oxlint": "^1.71.0",
-    "vite": "^8.1.1"
+  "engines": {
+    "node": ">=24.0.0"
   }
 }
