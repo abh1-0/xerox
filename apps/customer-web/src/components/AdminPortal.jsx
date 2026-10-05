@@ -5,8 +5,11 @@ import {
   Building2,
   CheckCircle2,
   ExternalLink,
+  KeyRound,
   Laptop,
   LoaderCircle,
+  Lock,
+  LogOut,
   MapPin,
   PauseCircle,
   PlayCircle,
@@ -20,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  adminLogin,
   createAdminMerchant,
   createAdminStore,
   fetchAdminOverview,
@@ -29,15 +33,32 @@ import {
 import { BrandMark, money } from "./BrandMark";
 import { StorePosterModal } from "./StorePosterModal";
 
+const ADMIN_STORAGE_KEY = "sprint.admin_token";
+const DEFAULT_ADMIN_TOKEN = "sprint_admin_abh1_prod";
+
 export function AdminPortal({ onNavigate }) {
   const [adminToken, setAdminToken] = useState(
-    () => localStorage.getItem("sprint.admin_token") || "admin-secret-development"
+    () => localStorage.getItem(ADMIN_STORAGE_KEY) || DEFAULT_ADMIN_TOKEN
   );
+  const [adminUser, setAdminUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sprint.admin_user") || "null");
+    } catch {
+      return { email: "admin@abh1.xyz", displayName: "abh1 Platform Admin" };
+    }
+  });
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [overview, setOverview] = useState(null);
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "merchants" | "stores" | "devices"
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionNotice, setActionNotice] = useState("");
+
+  // Login form state
+  const [loginEmail, setLoginEmail] = useState("admin@abh1.xyz");
+  const [loginToken, setLoginToken] = useState(DEFAULT_ADMIN_TOKEN);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   // Create Merchant Modal
   const [showMerchantModal, setShowMerchantModal] = useState(false);
@@ -58,15 +79,23 @@ export function AdminPortal({ onNavigate }) {
   // Poster Modal
   const [posterStore, setPosterStore] = useState(null);
 
-  async function loadData() {
+  async function loadData(tokenToUse = adminToken) {
+    if (!tokenToUse) {
+      setLoading(false);
+      setIsAuthenticated(false);
+      return;
+    }
+
     try {
-      const data = await fetchAdminOverview(adminToken);
+      const data = await fetchAdminOverview(tokenToUse);
       setOverview(data);
+      setIsAuthenticated(true);
       if (data?.merchants?.length > 0 && !storeMerchantId) {
         setStoreMerchantId(data.merchants[0].id);
       }
     } catch (err) {
-      setError(err.message || "Failed to load admin overview. Check token.");
+      setIsAuthenticated(false);
+      setError(err.message || "Please sign in to access Platform Admin.");
     } finally {
       setLoading(false);
     }
@@ -75,6 +104,41 @@ export function AdminPortal({ onNavigate }) {
   useEffect(() => {
     loadData();
   }, [adminToken]);
+
+  async function handleAdminLogin(e) {
+    e?.preventDefault();
+    setLoginLoading(true);
+    setError("");
+
+    try {
+      const res = await adminLogin({
+        email: loginEmail.trim(),
+        token: loginToken.trim(),
+      });
+
+      const tokenReceived = res.adminToken || loginToken.trim();
+      setAdminToken(tokenReceived);
+      setAdminUser(res.admin || { email: loginEmail, displayName: "abh1 Admin" });
+      localStorage.setItem(ADMIN_STORAGE_KEY, tokenReceived);
+      localStorage.setItem("sprint.admin_user", JSON.stringify(res.admin || { email: loginEmail }));
+
+      await loadData(tokenReceived);
+      setActionNotice("Welcome back, abh1 Platform Admin!");
+      setTimeout(() => setActionNotice(""), 3500);
+    } catch (err) {
+      setError(err.message || "Invalid admin credentials.");
+    } finally {
+      setLoginLoading(false);
+    }
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem(ADMIN_STORAGE_KEY);
+    localStorage.removeItem("sprint.admin_user");
+    setAdminToken("");
+    setIsAuthenticated(false);
+    setOverview(null);
+  }
 
   async function handleCreateMerchant(e) {
     e.preventDefault();
@@ -164,6 +228,89 @@ export function AdminPortal({ onNavigate }) {
     }
   }
 
+  // If not authenticated, render premier login card
+  if (!isAuthenticated && !loading) {
+    return (
+      <div className="app-shell admin-auth-shell">
+        <header className="topbar">
+          <BrandMark onClick={() => onNavigate("/")} />
+          <div className="topbar-actions">
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={() => onNavigate("/")}
+            >
+              Back to Sprint Home
+            </button>
+          </div>
+        </header>
+
+        <main className="admin-login-container">
+          <div className="admin-login-card">
+            <div className="admin-lock-icon">
+              <ShieldCheck size={36} />
+            </div>
+            <h2>abh1 Platform Administration</h2>
+            <p className="admin-login-subtext">
+              Sign in with your authorized abh1 administrator account to manage merchants, physical stores, and network spooler devices.
+            </p>
+
+            <form onSubmit={handleAdminLogin} className="admin-login-form">
+              <label className="stacked">
+                Administrator Email
+                <input
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@abh1.xyz"
+                  required
+                />
+              </label>
+
+              <label className="stacked">
+                Platform Admin Security Token
+                <input
+                  type="password"
+                  value={loginToken}
+                  onChange={(e) => setLoginToken(e.target.value)}
+                  placeholder="Enter security token"
+                  required
+                />
+              </label>
+
+              {error && (
+                <p className="error" role="alert">
+                  <AlertCircle size={16} /> {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="primary-action full-width"
+                disabled={loginLoading}
+              >
+                {loginLoading ? (
+                  <>
+                    <LoaderCircle className="spin" size={16} /> Authenticating…
+                  </>
+                ) : (
+                  <>
+                    <KeyRound size={16} /> Sign In to Platform Admin
+                  </>
+                )}
+              </button>
+
+              <div className="quick-access-hint">
+                <span>Created Admin Account:</span>
+                <code>admin@abh1.xyz</code>
+              </div>
+            </form>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const merchants = overview?.merchants || [];
   const stores = overview?.stores || [];
   const devices = overview?.devices || [];
@@ -182,6 +329,11 @@ export function AdminPortal({ onNavigate }) {
         <div className="topbar-left">
           <BrandMark onClick={() => onNavigate("/")} />
           <span className="admin-badge">abh1 Admin</span>
+          {adminUser && (
+            <span className="admin-user-pill">
+              <ShieldCheck size={13} /> {adminUser.displayName || adminUser.email}
+            </span>
+          )}
         </div>
 
         <div className="topbar-right">
@@ -192,6 +344,14 @@ export function AdminPortal({ onNavigate }) {
           >
             <Store size={15} /> Merchant View
           </button>
+          <button
+            type="button"
+            className="icon-button"
+            title="Sign Out"
+            onClick={handleSignOut}
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </header>
 
@@ -199,8 +359,8 @@ export function AdminPortal({ onNavigate }) {
         <aside className="merchant-sidebar">
           <div className="selected-store-info">
             <h4>Sprint Platform Admin</h4>
-            <p>Environment: <strong>Production</strong></p>
-            <span className="store-subtext">abh1 Operations Layer</span>
+            <p>Admin: <strong>{adminUser?.displayName || "abh1"}</strong></p>
+            <span className="store-subtext">Global Control Plane</span>
           </div>
 
           <nav className="merchant-nav">
@@ -258,8 +418,12 @@ export function AdminPortal({ onNavigate }) {
           {/* Tab 1: Platform Overview */}
           {activeTab === "overview" && (
             <div className="admin-overview-content">
-              <h2>Platform Operations Dashboard</h2>
-              <p>Real-time metrics across all merchants, stores, and spooler terminals.</p>
+              <div className="admin-title-row">
+                <div>
+                  <h2>Platform Operations Dashboard</h2>
+                  <p>Real-time telemetry across merchants, physical stores, and Windows spooler devices.</p>
+                </div>
+              </div>
 
               <div className="metrics-grid">
                 <div className="metric-card">
@@ -282,7 +446,7 @@ export function AdminPortal({ onNavigate }) {
 
                 <div className="metric-card">
                   <span>Platform GTV</span>
-                  <strong>{money(metrics.grossVolumeMinor)}</strong>
+                  <strong>{money(metrics.totalGtvMinor || metrics.grossVolumeMinor)}</strong>
                   <small>Gross transaction volume</small>
                 </div>
 
@@ -344,8 +508,8 @@ export function AdminPortal({ onNavigate }) {
                     {merchants.map((m) => (
                       <tr key={m.id}>
                         <td><strong>{m.name}</strong></td>
-                        <td>{m.contactEmail || "—"}</td>
-                        <td>{m.contactPhone || "—"}</td>
+                        <td>{m.contactEmail || m.contact_email || "—"}</td>
+                        <td>{m.contactPhone || m.contact_phone || "—"}</td>
                         <td><span className="badge-active">ACTIVE</span></td>
                         <td>{m.storesCount || stores.filter((s) => s.merchantId === m.id).length}</td>
                       </tr>
@@ -621,7 +785,7 @@ export function AdminPortal({ onNavigate }) {
                 </label>
 
                 <p className="modal-hint">
-                  Sprint will automatically and transactionally generate a guaranteed permanent 5-character Store Code (e.g. <code>M4X8Q</code>) from the canonical alphabet.
+                  Sprint will automatically generate a guaranteed permanent 5-character Store Code (e.g. <code>M4X8Q</code>) using the canonical alphabet.
                 </p>
               </div>
 

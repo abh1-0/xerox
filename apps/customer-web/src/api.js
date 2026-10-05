@@ -41,13 +41,20 @@ export async function fetchShop(identifier) {
 
 // Customer
 export async function createCustomerSession() {
-  return request("/v1/customer/sessions", { method: "POST" });
+  const data = await request("/v1/customer/sessions", { method: "POST" });
+  const token = data?.token || data?.session?.token;
+  return {
+    ...data,
+    token,
+    session: { token, expiresAt: data?.expiresAt },
+  };
 }
 
 export async function uploadAttachment(file, storeCode, sessionToken) {
   const formData = new FormData();
   formData.set("file", file);
   formData.set("storeCode", storeCode);
+  formData.set("shopSlug", storeCode);
   return request("/v1/customer/attachments", {
     method: "POST",
     token: sessionToken,
@@ -98,6 +105,13 @@ export async function respondToQuote(requestId, quoteId, action, sessionToken) {
 }
 
 // Platform Admin
+export async function adminLogin(credentials) {
+  return request("/v1/admin/login", {
+    method: "POST",
+    body: credentials,
+  });
+}
+
 export async function fetchAdminOverview(adminToken) {
   return request("/v1/admin/overview", { adminToken });
 }

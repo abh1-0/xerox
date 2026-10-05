@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   AlertCircle,
   ArrowRight,
+  BookOpen,
   CheckCircle2,
   ChevronDown,
   Clock3,
@@ -9,10 +10,13 @@ import {
   Download,
   FileCheck2,
   FileText,
+  HelpCircle,
   Laptop,
   LoaderCircle,
   MapPin,
+  Minus,
   PauseCircle,
+  Phone,
   PlayCircle,
   Plus,
   Printer,
@@ -38,12 +42,13 @@ import {
 } from "../api";
 import { BrandMark, money } from "./BrandMark";
 import { StorePosterModal } from "./StorePosterModal";
+import { DesktopSetupGuide } from "./DesktopSetupGuide";
 import { statusLabel } from "@sprint/contracts";
 
 export function MerchantPortal({ onNavigate }) {
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
-  const [activeTab, setActiveTab] = useState("requests"); // "requests" | "qr" | "catalog" | "devices"
+  const [activeTab, setActiveTab] = useState("requests"); // "requests" | "guide" | "devices" | "catalog" | "qr"
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterState, setFilterState] = useState("ALL");
@@ -88,7 +93,6 @@ export function MerchantPortal({ onNavigate }) {
       try {
         const res = await fetchMerchantRequests();
         if (!cancelled && res?.requests) {
-          // Filter by selected store if store has storeCode
           const filtered = res.requests.filter(
             (r) =>
               !selectedStore.storeCode ||
@@ -98,12 +102,12 @@ export function MerchantPortal({ onNavigate }) {
           setRequests(filtered);
         }
       } catch (err) {
-        // Continue polling
+        // Keep polling
       }
     }
 
     poll();
-    const interval = setInterval(poll, 3500);
+    const interval = setInterval(poll, 3000);
     return () => {
       cancelled = true;
       clearInterval(interval);
@@ -141,6 +145,8 @@ export function MerchantPortal({ onNavigate }) {
       setRequests((prev) =>
         prev.map((r) => (r.id === requestId ? { ...r, state: nextState } : r))
       );
+      setActionNotice(`Request status updated to ${statusLabel(nextState)}`);
+      setTimeout(() => setActionNotice(""), 2500);
     } catch (err) {
       setError(err.message || "Failed to advance request");
     }
@@ -160,6 +166,8 @@ export function MerchantPortal({ onNavigate }) {
           return r;
         })
       );
+      setActionNotice(`Item status updated to ${nextStatus}`);
+      setTimeout(() => setActionNotice(""), 2500);
     } catch (err) {
       setError(err.message || "Failed to update item status");
     }
@@ -182,7 +190,7 @@ export function MerchantPortal({ onNavigate }) {
       setQuoteModal(null);
       setQuoteAmount("");
       setQuoteNotes("");
-      setActionNotice("Quote proposal sent directly to customer!");
+      setActionNotice("Quote proposal sent directly to customer screen!");
       setTimeout(() => setActionNotice(""), 3500);
     } catch (err) {
       setError(err.message || "Failed to propose quote");
@@ -201,9 +209,33 @@ export function MerchantPortal({ onNavigate }) {
       setActionNotice("Windows Terminal paired successfully!");
       setTimeout(() => setActionNotice(""), 4000);
     } catch (err) {
-      setError(err.message || "Failed to pair device. Check the pairing code.");
+      setError(err.message || "Failed to pair device. Check the 7-character pairing code.");
     } finally {
       setPairingLoading(false);
+    }
+  }
+
+  async function handleUpdateStock(product, delta) {
+    if (!selectedStore) return;
+    const newQty = Math.max(0, (product.inventoryCount || product.quantity || 0) + delta);
+    try {
+      await saveMerchantProduct(selectedStore.id, {
+        id: product.id,
+        name: product.name,
+        priceMinor: product.priceMinor || product.price_minor,
+        category: product.category,
+        quantity: newQty,
+        trackInventory: true,
+      });
+
+      setSelectedStore((prev) => {
+        const nextProducts = (prev.products || []).map((p) =>
+          p.id === product.id ? { ...p, quantity: newQty, inventoryCount: newQty } : p
+        );
+        return { ...prev, products: nextProducts };
+      });
+    } catch (err) {
+      setError(err.message || "Failed to update stock");
     }
   }
 
@@ -227,7 +259,7 @@ export function MerchantPortal({ onNavigate }) {
       <header className="topbar">
         <div className="topbar-left">
           <BrandMark onClick={() => onNavigate("/")} />
-          <span className="portal-badge">Merchant</span>
+          <span className="portal-badge">Merchant Portal</span>
         </div>
 
         <div className="topbar-right">
@@ -262,11 +294,11 @@ export function MerchantPortal({ onNavigate }) {
             >
               {selectedStore.operationalStatus === "ACTIVE" ? (
                 <>
-                  <PlayCircle size={16} /> Accepting Requests
+                  <PlayCircle size={16} /> Accepting Orders
                 </>
               ) : (
                 <>
-                  <PauseCircle size={16} /> Store Paused
+                  <PauseCircle size={16} /> Orders Paused
                 </>
               )}
             </button>
@@ -290,10 +322,10 @@ export function MerchantPortal({ onNavigate }) {
           <div className="selected-store-info">
             <h4>{selectedStore?.displayName || "Loading Store…"}</h4>
             <p>
-              Code: <strong>{selectedStore?.storeCode || selectedStore?.slug}</strong>
+              Store Code: <strong>{selectedStore?.storeCode || selectedStore?.slug}</strong>
             </p>
             <span className="store-subtext">
-              {selectedStore?.city || "Local merchant"}
+              {selectedStore?.address ? `${selectedStore.address}, ` : ""}{selectedStore?.city || "Local merchant"}
             </span>
           </div>
 
@@ -303,7 +335,7 @@ export function MerchantPortal({ onNavigate }) {
               className={`nav-tab ${activeTab === "requests" ? "active" : ""}`}
               onClick={() => setActiveTab("requests")}
             >
-              <Clock3 size={18} /> Requests Queue
+              <Clock3 size={18} /> Live Orders Queue
               {requests.filter((r) => r.state === "SUBMITTED").length > 0 && (
                 <span className="queue-pill">
                   {requests.filter((r) => r.state === "SUBMITTED").length}
@@ -313,10 +345,18 @@ export function MerchantPortal({ onNavigate }) {
 
             <button
               type="button"
-              className={`nav-tab ${activeTab === "qr" ? "active" : ""}`}
-              onClick={() => setActiveTab("qr")}
+              className={`nav-tab ${activeTab === "guide" ? "active" : ""}`}
+              onClick={() => setActiveTab("guide")}
             >
-              <QrCode size={18} /> Store QR & Poster
+              <BookOpen size={18} /> Desktop App Guide
+            </button>
+
+            <button
+              type="button"
+              className={`nav-tab ${activeTab === "devices" ? "active" : ""}`}
+              onClick={() => setActiveTab("devices")}
+            >
+              <Laptop size={18} /> Windows Terminals
             </button>
 
             <button
@@ -329,10 +369,10 @@ export function MerchantPortal({ onNavigate }) {
 
             <button
               type="button"
-              className={`nav-tab ${activeTab === "devices" ? "active" : ""}`}
-              onClick={() => setActiveTab("devices")}
+              className={`nav-tab ${activeTab === "qr" ? "active" : ""}`}
+              onClick={() => setActiveTab("qr")}
             >
-              <Laptop size={18} /> Windows Terminals
+              <QrCode size={18} /> Store QR & Poster
             </button>
           </nav>
         </aside>
@@ -362,8 +402,8 @@ export function MerchantPortal({ onNavigate }) {
             <div className="requests-tab-content">
               <div className="requests-header-row">
                 <div>
-                  <h2>Customer Requests</h2>
-                  <p>Real-time queue for {selectedStore?.displayName}.</p>
+                  <h2>Live Orders Queue</h2>
+                  <p>Incoming customer orders at {selectedStore?.displayName}.</p>
                 </div>
 
                 <div className="filter-chips">
@@ -383,11 +423,11 @@ export function MerchantPortal({ onNavigate }) {
               {filteredRequests.length === 0 ? (
                 <div className="empty-requests-card">
                   <Clock3 size={40} className="empty-icon" />
-                  <h3>No requests found in this view</h3>
+                  <h3>No orders in this queue</h3>
                   <p>
                     {filterState === "NEW"
-                      ? "No new incoming orders right now."
-                      : "When customers submit requests at your counter, they will appear here live."}
+                      ? "No new pending requests right now."
+                      : "When customers submit requests at your counter, they will appear here live with instant status updates."}
                   </p>
                 </div>
               ) : (
@@ -406,9 +446,9 @@ export function MerchantPortal({ onNavigate }) {
                         <div className="m-card-amount">
                           <strong>{money(req.amountMinor, req.currency)}</strong>
                           <small>
-                            {req.paymentMethod === "COUNTER"
+                            {req.paymentMethod === "PAY_AT_COUNTER" || req.paymentMethod === "COUNTER"
                               ? "Pay at Counter"
-                              : req.paymentStatus === "COMPLETED"
+                              : req.paymentStatus === "PAID"
                               ? "Paid Online"
                               : "Payment Pending"}
                           </small>
@@ -419,7 +459,9 @@ export function MerchantPortal({ onNavigate }) {
                         <div className="m-customer-line">
                           <User size={14} /> Customer: <strong>{req.customerName}</strong>
                           {req.customerPhone && (
-                            <span> · Ph: {req.customerPhone}</span>
+                            <span className="customer-phone">
+                              <Phone size={12} /> {req.customerPhone}
+                            </span>
                           )}
                         </div>
                       )}
@@ -442,9 +484,9 @@ export function MerchantPortal({ onNavigate }) {
                             <div className="m-item-left">
                               {item.itemType === "PRINT" && <Printer size={16} />}
                               {item.itemType === "SERVICE" && <FileText size={16} />}
-                              {item.itemType === "STATIONERY" && (
+                              {item.itemType === "STATIONERY" || item.itemType === "PRODUCT" ? (
                                 <ShoppingBag size={16} />
-                              )}
+                              ) : null}
                               <span>{item.title}</span>
                               {item.quantity > 1 && (
                                 <strong className="qty-tag">x{item.quantity}</strong>
@@ -459,8 +501,8 @@ export function MerchantPortal({ onNavigate }) {
                               )}
 
                               {item.itemType === "SERVICE" &&
-                                item.detailsJson?.priceMode === "QUOTE" &&
-                                req.state === "SUBMITTED" && (
+                                (item.detailsJson?.priceMode === "QUOTE" || item.detailsJson?.priceMode === "MERCHANT_QUOTE") &&
+                                (req.state === "SUBMITTED" || req.state === "AWAITING_QUOTE") && (
                                   <button
                                     type="button"
                                     className="quote-btn"
@@ -485,7 +527,7 @@ export function MerchantPortal({ onNavigate }) {
 
                       {/* State Advancement Buttons */}
                       <div className="m-workflow-actions">
-                        {req.state === "SUBMITTED" && (
+                        {(req.state === "SUBMITTED" || req.state === "AWAITING_QUOTE") && (
                           <button
                             type="button"
                             className="primary-action"
@@ -517,7 +559,7 @@ export function MerchantPortal({ onNavigate }) {
                               handleTransitionRequest(req.id, "READY")
                             }
                           >
-                            Mark Ready for Pickup
+                            Mark Ready for Counter Pickup
                           </button>
                         )}
 
@@ -529,7 +571,7 @@ export function MerchantPortal({ onNavigate }) {
                               handleTransitionRequest(req.id, "COMPLETED")
                             }
                           >
-                            Fulfill & Complete
+                            Mark Fulfill & Completed
                           </button>
                         )}
 
@@ -546,122 +588,37 @@ export function MerchantPortal({ onNavigate }) {
             </div>
           )}
 
-          {/* Tab 2: Store QR & Poster */}
-          {activeTab === "qr" && selectedStore && (
-            <div className="qr-tab-content">
-              <div className="qr-tab-header">
-                <h2>Store QR & Counter Poster</h2>
-                <p>
-                  Print and place this QR poster at your shop counter. Customers scan it to open your exact store.
-                </p>
-              </div>
-
-              <div className="qr-tab-card">
-                <div className="qr-card-details">
-                  <h3>{selectedStore.displayName}</h3>
-                  <p>Permanent Store Code: <strong>{selectedStore.storeCode || selectedStore.slug}</strong></p>
-                  <p>Customer URL: <code>https://sprint.abh1.xyz/s/{selectedStore.storeCode || selectedStore.slug}</code></p>
-                  <div className="qr-actions-row">
-                    <button
-                      type="button"
-                      className="primary-action"
-                      onClick={() => setShowPoster(true)}
-                    >
-                      <Printer size={16} /> Open Printable Counter Poster
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Tab 2: Desktop Setup Guide */}
+          {activeTab === "guide" && (
+            <DesktopSetupGuide
+              store={selectedStore}
+              onPairClick={() => setActiveTab("devices")}
+            />
           )}
 
-          {/* Tab 3: Catalog & Stock */}
-          {activeTab === "catalog" && selectedStore && (
-            <div className="catalog-tab-content">
-              <h2>Services & Stationery Inventory</h2>
-              <p>Manage items available to customers when they scan your store QR.</p>
-
-              <div className="catalog-section">
-                <h3>Store Services</h3>
-                <div className="catalog-table-wrap">
-                  <table className="catalog-table">
-                    <thead>
-                      <tr>
-                        <th>Service</th>
-                        <th>Price Mode</th>
-                        <th>Standard Rate</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(selectedStore.services || [
-                        { id: "1", name: "Document Scanning", priceMode: "STARTING_AT", priceMinor: 1000 },
-                        { id: "2", name: "Spiral Binding", priceMode: "FIXED", priceMinor: 4000 },
-                        { id: "3", name: "Document Lamination", priceMode: "FIXED", priceMinor: 2500 },
-                      ]).map((srv) => (
-                        <tr key={srv.id}>
-                          <td><strong>{srv.name}</strong></td>
-                          <td><code>{srv.priceMode}</code></td>
-                          <td>{money(srv.priceMinor, selectedStore.currency)}</td>
-                          <td><span className="badge-active">Enabled</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="catalog-section">
-                <h3>Stationery Stock</h3>
-                <div className="catalog-table-wrap">
-                  <table className="catalog-table">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th>Category</th>
-                        <th>Unit Price</th>
-                        <th>Inventory</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(selectedStore.products || [
-                        { id: "p1", name: "Classmate Notebook (160 Pages)", category: "Notebooks", priceMinor: 6500, inventoryCount: 45 },
-                        { id: "p2", name: "Reynolds Ballpoint Pen (Blue)", category: "Pens", priceMinor: 1000, inventoryCount: 150 },
-                        { id: "p3", name: "Camlin Highlighter Set", category: "Markers", priceMinor: 12000, inventoryCount: 18 },
-                        { id: "p4", name: "Fevicol MR Adhesive (50g)", category: "Adhesives", priceMinor: 2500, inventoryCount: 30 },
-                      ]).map((prod) => (
-                        <tr key={prod.id}>
-                          <td><strong>{prod.name}</strong></td>
-                          <td>{prod.category}</td>
-                          <td>{money(prod.priceMinor, selectedStore.currency)}</td>
-                          <td>
-                            <span className="stock-count-badge">
-                              {prod.inventoryCount} in stock
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Tab 4: Windows Terminals */}
+          {/* Tab 3: Windows Terminals */}
           {activeTab === "devices" && selectedStore && (
             <div className="devices-tab-content">
               <div className="devices-header">
-                <h2>Windows Merchant Terminals</h2>
-                <p>
-                  Connect your store's Windows desktop PC to enable automatic printing straight to your local printer spooler.
-                </p>
+                <div>
+                  <h2>Windows Merchant Terminals</h2>
+                  <p>
+                    Connect your shop's Windows PC to enable direct spooler printing to your Xerox and laser printers.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="secondary-action"
+                  onClick={() => setActiveTab("guide")}
+                >
+                  <BookOpen size={16} /> Open Setup Guide
+                </button>
               </div>
 
               <div className="pair-card">
-                <h3>Pair New Windows Terminal</h3>
+                <h3>Pair Windows Counter PC</h3>
                 <p>
-                  Open the Sprint Merchant application on your Windows PC and click <strong>Get Pairing Code</strong>. Enter the 7-character code below:
+                  Launch <code>Sprint.Merchant.exe</code> on your Windows PC and click <strong>Get Pairing Code</strong>. Enter the 7-character code displayed on screen:
                 </p>
 
                 <form className="pair-form" onSubmit={handlePairDevice}>
@@ -682,7 +639,7 @@ export function MerchantPortal({ onNavigate }) {
                     >
                       {pairingLoading ? (
                         <>
-                          <LoaderCircle className="spin" size={16} /> Pairing…
+                          <LoaderCircle className="spin" size={16} /> Authorizing…
                         </>
                       ) : (
                         "Confirm Terminal Pairing"
@@ -693,11 +650,18 @@ export function MerchantPortal({ onNavigate }) {
               </div>
 
               <div className="paired-devices-section">
-                <h3>Connected Devices for {selectedStore.displayName}</h3>
+                <h3>Paired Devices for {selectedStore.displayName}</h3>
                 {(selectedStore.devices || []).length === 0 ? (
                   <div className="empty-devices-box">
                     <Laptop size={32} />
-                    <p>No Windows terminals currently paired to this store.</p>
+                    <p>No Windows desktop terminals currently paired to this store.</p>
+                    <button
+                      type="button"
+                      className="secondary-action small-btn"
+                      onClick={() => setActiveTab("guide")}
+                    >
+                      Follow 5-Step Desktop Guide
+                    </button>
                   </div>
                 ) : (
                   <div className="device-cards-grid">
@@ -708,11 +672,133 @@ export function MerchantPortal({ onNavigate }) {
                           <strong>{dev.name}</strong>
                         </div>
                         <p>ID: <code>{dev.id}</code></p>
-                        <span className="badge-online">Online / Ready</span>
+                        <span className="badge-online">Connected · Ready to Print</span>
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Tab 4: Catalog & Stock */}
+          {activeTab === "catalog" && selectedStore && (
+            <div className="catalog-tab-content">
+              <h2>Services & Counter Inventory</h2>
+              <p>Manage items available to customers when they scan your store QR code.</p>
+
+              <div className="catalog-section">
+                <h3>Stationery Counter Stock</h3>
+                <div className="catalog-table-wrap">
+                  <table className="catalog-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Unit Price</th>
+                        <th>Live Inventory</th>
+                        <th>Quick Stock Adjust</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(selectedStore.products || []).map((prod) => (
+                        <tr key={prod.id}>
+                          <td><strong>{prod.name}</strong></td>
+                          <td>{prod.category}</td>
+                          <td>{money(prod.priceMinor || prod.price_minor, selectedStore.currency)}</td>
+                          <td>
+                            <span className="stock-count-badge">
+                              {prod.inventoryCount ?? prod.quantity ?? 0} in stock
+                            </span>
+                          </td>
+                          <td>
+                            <div className="stock-stepper">
+                              <button
+                                type="button"
+                                className="icon-btn-stepper"
+                                onClick={() => handleUpdateStock(prod, -5)}
+                                title="Reduce stock by 5"
+                              >
+                                -5
+                              </button>
+                              <button
+                                type="button"
+                                className="icon-btn-stepper"
+                                onClick={() => handleUpdateStock(prod, 5)}
+                                title="Add 5 to stock"
+                              >
+                                +5
+                              </button>
+                              <button
+                                type="button"
+                                className="icon-btn-stepper"
+                                onClick={() => handleUpdateStock(prod, 20)}
+                                title="Add 20 to stock"
+                              >
+                                +20
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="catalog-section">
+                <h3>Document Services</h3>
+                <div className="catalog-table-wrap">
+                  <table className="catalog-table">
+                    <thead>
+                      <tr>
+                        <th>Service</th>
+                        <th>Price Mode</th>
+                        <th>Standard Rate</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(selectedStore.services || []).map((srv) => (
+                        <tr key={srv.id}>
+                          <td><strong>{srv.name}</strong></td>
+                          <td><code>{srv.priceMode || srv.price_mode}</code></td>
+                          <td>{money(srv.priceMinor || srv.price_minor, selectedStore.currency)}</td>
+                          <td><span className="badge-active">Active</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 5: Store QR & Poster */}
+          {activeTab === "qr" && selectedStore && (
+            <div className="qr-tab-content">
+              <div className="qr-tab-header">
+                <h2>Store QR Code & Counter Sign</h2>
+                <p>
+                  Print and display this counter poster. Customers scan it with any smartphone camera to open your exact store.
+                </p>
+              </div>
+
+              <div className="qr-tab-card">
+                <div className="qr-card-details">
+                  <h3>{selectedStore.displayName}</h3>
+                  <p>Permanent Store Code: <strong>{selectedStore.storeCode || selectedStore.slug}</strong></p>
+                  <p>Canonical Customer URL: <code>https://sprint.abh1.xyz/s/{selectedStore.storeCode || selectedStore.slug}</code></p>
+                  <div className="qr-actions-row">
+                    <button
+                      type="button"
+                      className="primary-action"
+                      onClick={() => setShowPoster(true)}
+                    >
+                      <Printer size={16} /> Open Printable Counter Poster
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
