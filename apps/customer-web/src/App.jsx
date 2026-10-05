@@ -674,7 +674,8 @@ export default function App() {
         <header className="topbar">
           <BrandMark />
           <span className="live-chip" role="status" aria-live="polite">
-            <i /> {connecting ? "Reconnecting…" : "Live"}
+            <i />{" "}
+            {DEMO_MODE ? "Demo status" : connecting ? "Reconnecting…" : "Live"}
           </span>
         </header>
         <main className="flow">
@@ -757,7 +758,9 @@ export default function App() {
         <footer>
           <Paperclip size={15} /> Your documents are shared only with this shop
           to fulfil your request. <span>sprint by abh1</span>
-          {DEMO_MODE && <em>Interactive demo — requests stay in this browser.</em>}
+          {DEMO_MODE && (
+            <em>Interactive demo — requests stay in this browser.</em>
+          )}
         </footer>
       </main>
     </div>
