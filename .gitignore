@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 .sprint-data
 .playwright-cli/
+.impeccable/review/
 apps/merchant-windows/Sprint.Merchant/bin
 apps/merchant-windows/Sprint.Merchant/obj
 dist
